@@ -1,6 +1,5 @@
 package com.company;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -26,7 +25,7 @@ public class Graph<Label> {
 
     public Graph(int size) {
         cardinal = size;
-        incidency = new ArrayList<LinkedList<Edge>>(size+1);
+        incidency = new ArrayList<LinkedList<Edge>>(size+1); // Pourquoi size+1 ? On ne parcourt même pas l'indice size+1 dans la boucle for
         for (int i = 0;i<cardinal;i++) {
             incidency.add(i, new LinkedList<Edge>());
         }
@@ -42,11 +41,13 @@ public class Graph<Label> {
 
 
     public String toString() {
+    	
         String result = new String("");
-        result.concat(cardinal + "\n");
+        result = result.concat(cardinal + "\n");
+        
         for (int i = 0; i<cardinal;i++) {
             for (Edge e : incidency.get(i)) {
-                result.concat(e.source + " " + e.destination + " "
+                result = result.concat(verticeNumber(e.source) + " " + verticeNumber(e.destination) + " "
                         + e.label.toString() + "\n");
             }
         }
@@ -54,42 +55,43 @@ public class Graph<Label> {
     }
     
     /**
-     * Crée le graphe d'implications à partir d'un fichier dans le répertoire courant
+     * AJoute au graphe les arcs définissant le graphe d'implications à partir du fichier fourni
      * 
-     * @return Le graphe d'implication construit
      * @throws FileNotFoundException Si le fichier n'est pas trouvé
      */
-    public Graph<Integer> buildImplicationGraph() throws FileNotFoundException {
-    	File file = new File("formula1.txt");
-    	Scanner scan = new Scanner(file);
+    public void buildImplicationGraph(Label label, Scanner scan) throws FileNotFoundException {
     	
-    	int size = scan.nextInt();
-    	Graph<Integer> newGraph = new Graph<Integer>(size * 2);
-    	
-    	int label = 0;
     	while(scan.hasNextLine()) {
     		int vertice1 = scan.nextInt();
     		int vertice2 = scan.nextInt();
     		
-    		newGraph.addArc(verticeIndex(-1 * vertice1), verticeIndex(vertice2), label);
-    		label++;
-    		newGraph.addArc(verticeIndex(-1 * vertice2), verticeIndex(vertice1), label);
-    		label++;
+    		this.addArc(verticeIndex(-1 * vertice1), verticeIndex(vertice2), label);
+    		this.addArc(verticeIndex(-1 * vertice2), verticeIndex(vertice1), label);
     	}
     	
     	scan.close();
-    	return newGraph;
     }
     
     /**
      * Renvoie l'indice du sommet vertice dans le tableau incidency d'un objet Graph
      * 
-     * @param size Le nombre de variables du problème 2-SAT
      * @param vertice Le numéro du sommet
      * @return L'indice du sommet dans incidency
      */
     public int verticeIndex(int vertice) {
-    	return vertice + (cardinal / 2);
+    	if(vertice < 0) return vertice + (cardinal/2);
+    	else return vertice + (cardinal/2 - 1);
+    }
+    
+    /**
+     * Renvoie le numéro du sommet correspondant à l'indice index dans le tableau incidency
+     * 
+     * @param index Indice du sommet
+     * @return Le numéro du sommet 
+     */
+    public int verticeNumber(int index) {
+    	if(index < cardinal) return index - (cardinal/2);
+    	else return index - (cardinal/2 - 1);
     }
 
     public interface ArcFunction<Label,K> {
