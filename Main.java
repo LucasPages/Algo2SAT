@@ -1,4 +1,3 @@
-package com.company;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,9 +13,13 @@ public class Main {
     	int size = scan.nextInt();
 		
 		Graph<Integer> graph = new Graph<Integer>(size*2);
-		graph.buildImplicationGraph(new Integer(0), scan);
+		graph.buildImplicationGraph(0, scan);
 		
 		System.out.println(graph);
+		
+		System.out.println("Le graphe transpose : \n" + graph.buildTranspose());
+		
+		scan.close();
 
 	}
 

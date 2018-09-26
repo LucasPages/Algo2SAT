@@ -1,4 +1,3 @@
-package com.company;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class Graph<Label> {
 
     public Graph(int size) {
         cardinal = size;
-        incidency = new ArrayList<LinkedList<Edge>>(size+1); // Pourquoi size+1 ? On ne parcourt même pas l'indice size+1 dans la boucle for
+        incidency = new ArrayList<LinkedList<Edge>>(size+1);
         for (int i = 0;i<cardinal;i++) {
             incidency.add(i, new LinkedList<Edge>());
         }
@@ -47,11 +46,22 @@ public class Graph<Label> {
         
         for (int i = 0; i<cardinal;i++) {
             for (Edge e : incidency.get(i)) {
-                result = result.concat(verticeNumber(e.source) + " " + verticeNumber(e.destination) + " "
-                        + e.label.toString() + "\n");
+                result += verticeNumber(e.source) + " " + verticeNumber(e.destination) + " "
+                        + e.label.toString() + "\n";
             }
         }
         return result;
+    }
+    
+    public Graph<Label> buildTranspose() {
+    	Graph<Label> transpose = new Graph<Label>(cardinal);
+    	
+    	for (int i= 0 ; i < cardinal ; i++) {
+    		for (Edge edge : incidency.get(i)) {
+    			transpose.addArc(edge.destination, edge.source, edge.label);
+    		}
+    	}
+    	return transpose;
     }
     
     /**
@@ -68,8 +78,6 @@ public class Graph<Label> {
     		this.addArc(verticeIndex(-1 * vertice1), verticeIndex(vertice2), label);
     		this.addArc(verticeIndex(-1 * vertice2), verticeIndex(vertice1), label);
     	}
-    	
-    	scan.close();
     }
     
     /**
