@@ -53,6 +53,12 @@ public class Graph<Label> {
         return result;
     }
     
+    /**
+    *
+    * Calcule le le transposé du graphe
+    *
+    * @return Le graphe transposé
+    */
     public Graph<Label> buildTranspose() {
     	Graph<Label> transpose = new Graph<Label>(cardinal);
     	
