@@ -53,12 +53,6 @@ public class Graph<Label> {
         return result;
     }
     
-    /**
-    *
-    * Calcule le le transposé du graphe
-    *
-    * @return Le graphe transposé
-    */
     public Graph<Label> buildTranspose() {
     	Graph<Label> transpose = new Graph<Label>(cardinal);
     	
@@ -86,6 +80,57 @@ public class Graph<Label> {
     	}
     }
     
+    
+    /**
+     * Effectue un parcours en profondeur du graphe
+     * 
+     * @return Les dates de fin de parcours des sommets
+     */
+    public int[] DFS() {
+    	boolean visited[] = new boolean[cardinal];
+    	int endDates[] = new int[cardinal];
+    	
+    	for(int index = 0; index < cardinal; index++) {
+    		visited[index] = false;
+    		endDates[index] = 0;
+    	}
+    	
+    	int date = 0;
+    	
+    	for(int index = 0; index < cardinal; index++) {
+    		if(!visited[index])
+    			date = DFSvertice(index, date, visited, endDates);
+    	}
+    	
+    	return endDates;
+    }
+    
+    /**
+     * Effectue un parcours en profondeur depuis un sommet spécifique du graphe
+     * 
+     * @param verticeIndex Le sommet source du parcours
+     * @param date La date de début du parcours
+     * @param visited Tableau de booléens indiquant quels sommets ont été visités
+     * @param endDates	Tableau des dates de fin de parcours pour chaque sommet
+     * 
+     * @return La date à la fin du parcours
+     */
+    public int DFSvertice(int verticeIndex, int date, boolean[] visited, int[] endDates) {
+    
+    	visited[verticeIndex] = true;
+    	date++;
+    	
+    	for(Edge e : incidency.get(verticeIndex)) {
+    		if(!visited[e.destination])
+    			date = DFSvertice(e.destination, date, visited, endDates);
+    	}
+    	
+    	date++;
+    	endDates[verticeIndex] = date;
+    	
+    	return date;
+    }
+    
     /**
      * Renvoie l'indice du sommet vertice dans le tableau incidency d'un objet Graph
      * 
@@ -104,7 +149,7 @@ public class Graph<Label> {
      * @return Le numéro du sommet 
      */
     public int verticeNumber(int index) {
-    	if(index < cardinal) return index - (cardinal/2);
+    	if(index < cardinal/2) return index - (cardinal/2);
     	else return index - (cardinal/2 - 1);
     }
 
