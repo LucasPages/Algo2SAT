@@ -86,20 +86,19 @@ public class Graph<Label> {
      * 
      * @return Les dates de fin de parcours des sommets
      */
-    public int[] DFS() {
+    public ArrayList<Integer> Dfs() {
     	boolean visited[] = new boolean[cardinal];
-    	int endDates[] = new int[cardinal];
+    	ArrayList<Integer> endDates = new ArrayList<Integer>();
     	
     	for(int index = 0; index < cardinal; index++) {
     		visited[index] = false;
-    		endDates[index] = 0;
     	}
     	
     	int date = 0;
     	
     	for(int index = 0; index < cardinal; index++) {
     		if(!visited[index])
-    			date = DFSvertice(index, date, visited, endDates);
+    			date = DfsVertice(index, date, visited, endDates);
     	}
     	
     	return endDates;
@@ -115,20 +114,28 @@ public class Graph<Label> {
      * 
      * @return La date à la fin du parcours
      */
-    public int DFSvertice(int verticeIndex, int date, boolean[] visited, int[] endDates) {
+    public int DfsVertice(int verticeIndex, int date, boolean[] visited, ArrayList<Integer> endDates) {
     
     	visited[verticeIndex] = true;
     	date++;
     	
     	for(Edge e : incidency.get(verticeIndex)) {
     		if(!visited[e.destination])
-    			date = DFSvertice(e.destination, date, visited, endDates);
+    			date = DfsVertice(e.destination, date, visited, endDates);
     	}
     	
     	date++;
-    	endDates[verticeIndex] = date;
+    	endDates.add(verticeIndex);
     	
     	return date;
+    }
+    
+    public ArrayList<LinkedList<Integer>> DfsTranspose(ArrayList<Integer> endDates){
+    	
+    	ArrayList<LinkedList<Integer>> stronglyConnectedComponents = new ArrayList<LinkedList<Integer>>();
+    	
+    	return stronglyConnectedComponents;
+    	
     }
     
     /**
