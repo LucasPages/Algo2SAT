@@ -86,7 +86,7 @@ public class Graph<Label> {
      * 
      * @return Les dates de fin de parcours des sommets
      */
-    public ArrayList<Integer> Dfs() {
+    public ArrayList<Integer> dfs() {
     	boolean visited[] = new boolean[cardinal];
     	ArrayList<Integer> endDates = new ArrayList<Integer>();
     	
@@ -94,11 +94,9 @@ public class Graph<Label> {
     		visited[index] = false;
     	}
     	
-    	int date = 0;
-    	
     	for(int index = 0; index < cardinal; index++) {
     		if(!visited[index])
-    			date = DfsVertice(index, date, visited, endDates);
+    			dfsVertice(index, visited, endDates);
     	}
     	
     	return endDates;
@@ -114,28 +112,94 @@ public class Graph<Label> {
      * 
      * @return La date à la fin du parcours
      */
-    public int DfsVertice(int verticeIndex, int date, boolean[] visited, ArrayList<Integer> endDates) {
+    public void dfsVertice(int verticeIndex, boolean[] visited, ArrayList<Integer> endDates) {
     
     	visited[verticeIndex] = true;
-    	date++;
     	
     	for(Edge e : incidency.get(verticeIndex)) {
     		if(!visited[e.destination])
-    			date = DfsVertice(e.destination, date, visited, endDates);
+    			dfsVertice(e.destination, visited, endDates);
     	}
-    	
-    	date++;
+
     	endDates.add(verticeIndex);
-    	
-    	return date;
+
     }
     
-    public ArrayList<LinkedList<Integer>> DfsTranspose(ArrayList<Integer> endDates){
+    /**
+     * Calcule les composantes fortements connexes du graphe
+     * 
+     * @param endDates Les dates de fin de chaque sommet dans le parcours en profondeur calculé
+     * @return Les composantes fortements connexes
+     */
+    public ArrayList<LinkedList<Integer>> dfsTranspose(ArrayList<Integer> endDates){
     	
     	ArrayList<LinkedList<Integer>> stronglyConnectedComponents = new ArrayList<LinkedList<Integer>>();
     	
+    	boolean visited[] = new boolean[cardinal];
+    	for(int index = 0; index < cardinal; index++)
+    		visited[index] = false;
+    	
+    	for(int index = cardinal - 1; index >= 0; index--) {
+    		if(!visited[endDates.get(index)]) {
+    			LinkedList<Integer> stronglyConnectedVertices = new LinkedList<Integer>();
+    			dfsTransposeVertex(endDates.get(index), visited, stronglyConnectedVertices);	
+    			stronglyConnectedComponents.add(stronglyConnectedVertices);
+    		}
+    	}
+    	
     	return stronglyConnectedComponents;
     	
+    }
+    
+    /**
+     * Parcours en profondeur dans le graphe transposé à partir d'un sommet spécifique
+     * 
+     * @param vertexIndex Indice du sommet source
+     * @param visited Tableau de booléens indiquant quels sommets ont été visités
+     * @param stronglyConnectedVertices Liste à remplir avec des sommets fortements connectés
+     */
+    public void dfsTransposeVertex(int vertexIndex, boolean[] visited, LinkedList<Integer> stronglyConnectedVertices){
+    	visited[vertexIndex] = true;
+    	stronglyConnectedVertices.add(vertexIndex);
+    	
+    	for(Edge edge : incidency.get(vertexIndex)) {
+    		if(!visited[edge.destination])
+    			dfsTransposeVertex(edge.destination, visited, stronglyConnectedVertices);
+    	}	
+    }
+    
+    //TODO Considérer la possibilité de créer une sous-classe Component pour pouvoir utiliser des méthodes et améliorer la lisibilité
+    
+    public boolean isSatisfiable(ArrayList<LinkedList<Integer>> stronglyConnectedComponents) {
+    	for(LinkedList<Integer> component : stronglyConnectedComponents) {
+    		if(!componentIsSatisfiable(component))
+    			return false;
+    	}
+    	return true;
+    }
+    
+    public boolean componentIsSatisfiable(LinkedList<Integer> component) {
+    	for(int index = 0; index < component.size(); index++) {
+    		if(countInstances(component, component.get(index)) > 1)
+    			return false;
+    	}
+    	return true;
+    }
+    
+    /**
+     * Commpte les occurences d'une valeur dans une liste chaînée
+     * 
+     * @param list Liste chaînée qui est analysée
+     * @param reference Valeur que l'on compte dans la liste
+     * @return Le nombre d'occurences de la valeur dans la liste chaînée
+     */
+    public int countInstances(LinkedList<Integer> list, int reference) {
+    	int count = 0;
+    	for(int value : list) {
+    		if(value == reference)
+    			count++;
+    	}
+    	return count;
     }
     
     /**
