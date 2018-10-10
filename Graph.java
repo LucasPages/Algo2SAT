@@ -90,8 +90,10 @@ public class Graph<Label> {
     public void buildImplicationGraph(Label label, Scanner scan) throws FileNotFoundException {
     	
     	while(scan.hasNextLine()) {
-    		int vertice1 = scan.nextInt();
-    		int vertice2 = scan.nextInt();
+    		String str = scan.nextLine();
+    		
+    		int vertice1 = Integer.valueOf(str.split(" ")[0]); //scan.nextInt();
+    		int vertice2 = Integer.valueOf(str.split(" ")[1]);
     		
     		this.addArc(vertexIndex(-1 * vertice1), vertexIndex(vertice2), label);
     		this.addArc(vertexIndex(-1 * vertice2), vertexIndex(vertice1), label);
@@ -185,9 +187,7 @@ public class Graph<Label> {
     			dfsOnTransposeVertex(edge.destination, visited, stronglyConnectedVertices);
     	}	
     }
-    
-    //TODO Considérer la possibilité de créer une sous-classe Component pour pouvoir utiliser des méthodes et améliorer la lisibilité
-    
+        
     public boolean isSatisfiable(ArrayList<LinkedList<Integer>> stronglyConnectedComponents) {
     	for(LinkedList<Integer> component : stronglyConnectedComponents) {
     		if(!componentIsSatisfiable(component))
@@ -197,27 +197,35 @@ public class Graph<Label> {
     }
     
     public boolean componentIsSatisfiable(LinkedList<Integer> component) {
-    	for(int index = 0; index < component.size(); index++) {
-    		if(countInstances(component, component.get(index)) > 1)
-    			return false;
-    	}
+    	if(componentContainsOppositeElements(component))
+    		return false;
     	return true;
     }
     
-    /**
-     * Commpte les occurences d'une valeur dans une liste chaînée
-     * 
-     * @param list Liste chaînée qui est analysée
-     * @param reference Valeur que l'on compte dans la liste
-     * @return Le nombre d'occurences de la valeur dans la liste chaînée
-     */
-    public int countInstances(LinkedList<Integer> list, int reference) {
-    	int count = 0;
-    	for(int value : list) {
-    		if(value == reference)
-    			count++;
+    public boolean componentContainsOppositeElements(LinkedList<Integer> component) {
+    	for(int index = 0; index < component.size(); index++) {
+    		if(componentContainsElement(component, index) && componentContainsElement(component, oppositeVertexIndex(index))) {
+    			System.out.println("coucou:"+component);
+    			System.out.println(index);
+    			System.out.println(oppositeVertexIndex(index));
+    			return true;
+    			
+    		}
     	}
-    	return count;
+    	return false;
+    }
+    
+    public boolean componentContainsElement(LinkedList<Integer> component, int element) {
+    	for(int value : component) {
+    		if(value == element)
+    			return true;
+    	}
+    	return false;
+    }
+    
+    public int oppositeVertexIndex(int vertexIndex) {
+    	int vertexNumber = vertexNumber(vertexIndex);
+    	return vertexIndex(vertexNumber * -1);
     }
     
     /**
