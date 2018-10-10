@@ -46,11 +46,29 @@ public class Graph<Label> {
         
         for (int i = 0; i<cardinal;i++) {
             for (Edge e : incidency.get(i)) {
-                result += verticeNumber(e.source) + " " + verticeNumber(e.destination) + " "
+                result += vertexNumber(e.source) + " " + vertexNumber(e.destination) + " "
                         + e.label.toString() + "\n";
             }
         }
         return result;
+    }
+    
+    public void printResult(ArrayList<LinkedList<Integer>> stronglyConnectedComponents) {
+    	
+    	System.out.println("Il y a " + stronglyConnectedComponents.size() + " composantes fortement connexes\n");
+		
+		for(int index = 0; index < stronglyConnectedComponents.size(); index++) {
+			System.out.println("Composante fortement connexe " + (index + 1));
+			
+			for(int vertex : stronglyConnectedComponents.get(index)){
+				System.out.print(vertexNumber(vertex) + " ");
+			}
+			
+			System.out.println();
+		}
+		
+		System.out.println(this.isSatisfiable(stronglyConnectedComponents) ? "Ce problème 2-SAT est satisfaisable":"Ce problème 2-SAT n'est pas satisfaisable");
+
     }
     
     public Graph<Label> buildTranspose() {
@@ -75,8 +93,8 @@ public class Graph<Label> {
     		int vertice1 = scan.nextInt();
     		int vertice2 = scan.nextInt();
     		
-    		this.addArc(verticeIndex(-1 * vertice1), verticeIndex(vertice2), label);
-    		this.addArc(verticeIndex(-1 * vertice2), verticeIndex(vertice1), label);
+    		this.addArc(vertexIndex(-1 * vertice1), vertexIndex(vertice2), label);
+    		this.addArc(vertexIndex(-1 * vertice2), vertexIndex(vertice1), label);
     	}
     }
     
@@ -86,7 +104,7 @@ public class Graph<Label> {
      * 
      * @return Les dates de fin de parcours des sommets
      */
-    public ArrayList<Integer> dfs() {
+    public ArrayList<Integer> fullDfs() {
     	boolean visited[] = new boolean[cardinal];
     	ArrayList<Integer> endDates = new ArrayList<Integer>();
     	
@@ -96,7 +114,7 @@ public class Graph<Label> {
     	
     	for(int index = 0; index < cardinal; index++) {
     		if(!visited[index])
-    			dfsVertice(index, visited, endDates);
+    			dfsOnVertex(index, visited, endDates);
     	}
     	
     	return endDates;
@@ -105,23 +123,23 @@ public class Graph<Label> {
     /**
      * Effectue un parcours en profondeur depuis un sommet spécifique du graphe
      * 
-     * @param verticeIndex Le sommet source du parcours
+     * @param vertexIndex Le sommet source du parcours
      * @param date La date de début du parcours
      * @param visited Tableau de booléens indiquant quels sommets ont été visités
      * @param endDates	Tableau des dates de fin de parcours pour chaque sommet
      * 
      * @return La date à la fin du parcours
      */
-    public void dfsVertice(int verticeIndex, boolean[] visited, ArrayList<Integer> endDates) {
+    public void dfsOnVertex(int vertexIndex, boolean[] visited, ArrayList<Integer> endDates) {
     
-    	visited[verticeIndex] = true;
+    	visited[vertexIndex] = true;
     	
-    	for(Edge e : incidency.get(verticeIndex)) {
+    	for(Edge e : incidency.get(vertexIndex)) {
     		if(!visited[e.destination])
-    			dfsVertice(e.destination, visited, endDates);
+    			dfsOnVertex(e.destination, visited, endDates);
     	}
 
-    	endDates.add(verticeIndex);
+    	endDates.add(vertexIndex);
 
     }
     
@@ -131,7 +149,7 @@ public class Graph<Label> {
      * @param endDates Les dates de fin de chaque sommet dans le parcours en profondeur calculé
      * @return Les composantes fortements connexes
      */
-    public ArrayList<LinkedList<Integer>> dfsTranspose(ArrayList<Integer> endDates){
+    public ArrayList<LinkedList<Integer>> dfsOnTranspose(ArrayList<Integer> endDates){
     	
     	ArrayList<LinkedList<Integer>> stronglyConnectedComponents = new ArrayList<LinkedList<Integer>>();
     	
@@ -142,7 +160,7 @@ public class Graph<Label> {
     	for(int index = cardinal - 1; index >= 0; index--) {
     		if(!visited[endDates.get(index)]) {
     			LinkedList<Integer> stronglyConnectedVertices = new LinkedList<Integer>();
-    			dfsTransposeVertex(endDates.get(index), visited, stronglyConnectedVertices);	
+    			dfsOnTransposeVertex(endDates.get(index), visited, stronglyConnectedVertices);	
     			stronglyConnectedComponents.add(stronglyConnectedVertices);
     		}
     	}
@@ -158,13 +176,13 @@ public class Graph<Label> {
      * @param visited Tableau de booléens indiquant quels sommets ont été visités
      * @param stronglyConnectedVertices Liste à remplir avec des sommets fortements connectés
      */
-    public void dfsTransposeVertex(int vertexIndex, boolean[] visited, LinkedList<Integer> stronglyConnectedVertices){
+    public void dfsOnTransposeVertex(int vertexIndex, boolean[] visited, LinkedList<Integer> stronglyConnectedVertices){
     	visited[vertexIndex] = true;
     	stronglyConnectedVertices.add(vertexIndex);
     	
     	for(Edge edge : incidency.get(vertexIndex)) {
     		if(!visited[edge.destination])
-    			dfsTransposeVertex(edge.destination, visited, stronglyConnectedVertices);
+    			dfsOnTransposeVertex(edge.destination, visited, stronglyConnectedVertices);
     	}	
     }
     
@@ -208,7 +226,7 @@ public class Graph<Label> {
      * @param vertice Le numéro du sommet
      * @return L'indice du sommet dans incidency
      */
-    public int verticeIndex(int vertice) {
+    public int vertexIndex(int vertice) {
     	if(vertice < 0) return vertice + (cardinal/2);
     	else return vertice + (cardinal/2 - 1);
     }
@@ -219,7 +237,7 @@ public class Graph<Label> {
      * @param index Indice du sommet
      * @return Le numéro du sommet 
      */
-    public int verticeNumber(int index) {
+    public int vertexNumber(int index) {
     	if(index < cardinal/2) return index - (cardinal/2);
     	else return index - (cardinal/2 - 1);
     }
